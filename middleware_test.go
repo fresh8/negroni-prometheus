@@ -7,15 +7,15 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/codegangsta/negroni"
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/urfave/negroni"
 )
 
 func Test_Logger(t *testing.T) {
 	recorder := httptest.NewRecorder()
 
 	n := negroni.New()
-	m := NewMiddleware("test")
+	m := NewMiddleware("fresh8", "testservice")
 	n.Use(m)
 	r := http.NewServeMux()
 	r.Handle("/metrics", prometheus.Handler())
@@ -37,10 +37,7 @@ func Test_Logger(t *testing.T) {
 	n.ServeHTTP(recorder, req1)
 	n.ServeHTTP(recorder, req2)
 	body := recorder.Body.String()
-	if !strings.Contains(body, reqsName) {
-		t.Errorf("body does not contain request total entry '%s'", reqsName)
-	}
 	if !strings.Contains(body, latencyName) {
-		t.Errorf("body does not contain request duration entry '%s'", reqsName)
+		t.Errorf("body does not contain request duration entry '%s'", latencyName)
 	}
 }
